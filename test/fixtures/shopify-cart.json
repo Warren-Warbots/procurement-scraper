@@ -1,0 +1,29 @@
+{
+  "token": "abc123",
+  "item_count": 3,
+  "currency": "USD",
+  "items": [
+    {
+      "sku": "WCP-0336",
+      "product_title": "6\" Aluminum Nutstrip",
+      "title": "6\" Aluminum Nutstrip",
+      "variant_title": "#10-32, .500\" Spacing",
+      "quantity": 2,
+      "price": 999,
+      "final_price": 999,
+      "url": "/products/nut-strips?variant=123&utm_source=email",
+      "vendor": "WestCoast Products"
+    },
+    {
+      "sku": "WCP-0620",
+      "product_title": "75t x 9mm Wide Timing Belt (HTD 5mm)",
+      "title": "75t x 9mm Wide Timing Belt (HTD 5mm)",
+      "variant_title": "Default Title",
+      "quantity": 1,
+      "price": 899,
+      "final_price": 899,
+      "url": "/products/htd-timing-belts-9mm-width?variant=456",
+      "vendor": "WestCoast Products"
+    }
+  ]
+}

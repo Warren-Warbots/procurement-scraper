@@ -1,0 +1,15 @@
+{
+  "name": "procurement-scraper",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Scrape the current cart or product page into clean procurement rows (TSV) for the team sheet.",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "jsdom": "^25.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "product": {
+    "title": "HTD 5mm Timing Belt (9mm Wide)",
+    "handle": "htd-timing-belts-9mm-width",
+    "vendor": "WestCoast Products",
+    "variants": [
+      { "id": 456, "title": "60 Tooth", "sku": "WCP-0617", "price": "7.99" },
+      { "id": 789, "title": "70 Tooth", "sku": "WCP-0619", "price": "8.99" }
+    ]
+  }
+}

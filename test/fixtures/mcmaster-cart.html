@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head><title>Order — McMaster-Carr</title></head>
+<body>
+  <!-- Each line: an image link + a description link to /<PARTNO>/, plus the
+       line-* inputs and a line-total-price div. Mirrors the live cart markup. -->
+  <div class="line">
+    <a href="/89015K51/"><img alt="" /></a>
+    <a href="/89015K51/">Multipurpose 6061 Aluminum Sheet, 0.063" Thick, 24" x 48"</a>
+    <input class="line-part-number-input" type="text" value="89015K51" />
+    <input class="line-reference-input" type="text" value="" />
+    <input class="line-quantity-input" type="text" value="2" />
+    <div>$92.53</div>
+    <div class="line-section line-total-price">$185.06</div>
+  </div>
+
+  <div class="line">
+    <a href="/91251A342/">Black-Oxide Alloy Steel Socket Head Screw, 10-32 Thread Size, 1/2" Long</a>
+    <input class="line-part-number-input" type="text" value="91251A342" />
+    <input class="line-reference-input" type="text" value="" />
+    <input class="line-quantity-input" type="text" value="4" />
+    <div>$14.57</div>
+    <div class="line-section line-total-price">$58.28</div>
+  </div>
+
+  <!-- Blank "add a line" row: has part/qty inputs but no total — must be skipped. -->
+  <input class="line-part-number-input" type="text" value="" />
+  <input class="line-quantity-input" type="text" value="" />
+
+  <!-- Order summary totals must be ignored (not .line-total-price). -->
+  <td class="order-pad-charge-amount2">$580.74</td>
+</body>
+</html>
