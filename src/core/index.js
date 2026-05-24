@@ -29,5 +29,5 @@ export async function scrape(opts = {}) {
   return { rows, tsv: toTSV(rows), mode, storeName, store: key, count: rows.length };
 }
 
-export { toTSV } from './tsv.js';
+export { toTSV, toHtml } from './tsv.js';
 export { recompute } from './normalize.js';

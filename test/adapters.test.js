@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { JSDOM } from 'jsdom';
 
-import { scrape, toTSV } from '../src/core/index.js';
+import { scrape, toTSV, toHtml } from '../src/core/index.js';
 import { COLUMNS } from '../src/core/tsv.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -148,4 +148,15 @@ test('TSV emits exactly columns A-I in order, tab-separated, no header', async (
     '1/1/2026', 'Tester', 'WCP-0336', '6" Aluminum Nutstrip (#10-32, .500" Spacing)',
     '2', '9.99', '19.98', 'WCP', 'https://wcproducts.com/products/nut-strips?variant=123',
   ]);
+});
+
+test('toHtml emits a <table> with one <tr> per row and 9 <td> per row, HTML-escaped', async () => {
+  const ctx = ctxFromHtml('<!doctype html><body>', 'https://wcproducts.com/cart', {
+    '/cart.js': json('shopify-cart.json'),
+  });
+  const { rows } = await scrape({ ...fixedOpts, ctx });
+  const html = toHtml(rows);
+  assert.match(html, /^<table>.*<\/table>$/s);
+  assert.equal((html.match(/<tr>/g) || []).length, 2);
+  assert.equal((html.match(/<td>/g) || []).length, 18); // 9 cols × 2 rows
 });

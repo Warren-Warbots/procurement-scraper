@@ -9,7 +9,7 @@
 // lifted into the top layer (Popover API) so an ancestor `transform` can't
 // knock position:fixed to the bottom of the page.
 
-import { scrape, toTSV, recompute } from '../core/index.js';
+import { scrape, toTSV, toHtml, recompute } from '../core/index.js';
 
 const HOST = 'procurement-scraper-overlay';
 const KEY = 'procReq.requestor';
@@ -114,14 +114,33 @@ function render(card, r, savedName) {
     const n = reqInput.value.trim();
     if (n) localStorage.setItem(KEY, n);
     setName(n);
-    let ok;
-    try { await navigator.clipboard.writeText(ta.value); ok = 1; }
-    catch { ta.focus(); ta.select(); ok = document.execCommand('copy'); }
+    const ok = await copyRows(rows, ta);
     stat.textContent = ok ? `Copied ${rows.length} row${rows.length === 1 ? '' : 's'} — paste into the sheet` : 'Select the text below and copy';
     stat.style.color = ok ? '#137333' : '#c5221f';
   };
 
   card.append(head, reqLabel, table, actions, ta);
+}
+
+// Put BOTH a TSV (text/plain) and an HTML table (text/html) on the clipboard.
+// Sheets/Excel use the HTML table and lay it into cells reliably; plain-text
+// targets get the TSV. Falls back to writeText, then a textarea select+copy.
+async function copyRows(rows, textarea) {
+  const tsv = toTSV(rows);
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/plain': new Blob([tsv], { type: 'text/plain' }),
+          'text/html': new Blob([toHtml(rows)], { type: 'text/html' }),
+        }),
+      ]);
+      return true;
+    }
+  } catch {}
+  try { await navigator.clipboard.writeText(tsv); return true; } catch {}
+  try { textarea.focus(); textarea.select(); return document.execCommand('copy'); } catch {}
+  return false;
 }
 
 function mount() {
