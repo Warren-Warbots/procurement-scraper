@@ -10,26 +10,50 @@
 // knock position:fixed to the bottom of the page.
 
 import { scrape, toTSV, toHtml, recompute } from '../core/index.js';
+import markSvg from '../../assets/warbotslogo-mono.svg';
 
 const HOST = 'procurement-scraper-overlay';
 const KEY = 'procReq.requestor';
 
+// ── Warbots brand palette · MIRRORED LITERALS ──────────────────────────────
+// This overlay renders on third-party store pages (WCP/Amazon/McMaster) inside
+// a shadow root, styled via .style.cssText (CSSOM) because McMaster's CSP
+// blocks <style> elements and inline style="" attrs. We therefore CANNOT link
+// tokens.css here — values are mirrored as literals (same sanctioned pattern as
+// sigint's tokens_css.py constant). Hand-sync this block on any palette change.
+//   --wc-surge/card      #15203F   (--wc-surface)
+//   --wc-text            #F5F1E8
+//   --wc-text-dim        rgba(245,241,232,.62)
+//   --wc-text-mute       rgba(245,241,232,.38)
+//   --wc-border          rgba(255,255,255,.07)
+//   --wc-border-hi       rgba(255,255,255,.14)
+//   --wc-bg / btn-text   #0A1633
+//   --wc-bg-deep / input #070F22
+//   --wc-gold            #F0B842   --wc-gold-hover #E0A832
+//   --wc-green           #7CD49B   --wc-red        #E85D5D
+// Manrope can't load over a store's font-src CSP, so it leads a system fallback
+// stack (graceful degradation; favicon is N/A on this injected surface).
+const FONT = 'Manrope,-apple-system,system-ui,Segoe UI,Roboto,sans-serif';
+const C = {
+  gold: '#F0B842', goldHover: '#E0A832', green: '#7CD49B', red: '#E85D5D',
+};
 const S = {
-  card: 'box-sizing:border-box;width:min(420px,92vw);max-height:80vh;overflow:auto;background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.28);padding:14px;font:13px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif;',
-  head: 'display:flex;align-items:baseline;gap:8px;margin-bottom:10px;',
+  card: `box-sizing:border-box;width:min(420px,92vw);max-height:80vh;overflow:auto;background:#15203F;color:#F5F1E8;border:1px solid rgba(255,255,255,.14);border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);padding:14px;font:13px/1.45 ${FONT};`,
+  head: 'display:flex;align-items:center;gap:8px;margin-bottom:10px;',
+  mark: 'color:#F0B842;display:flex;flex:0 0 auto;',
   count: 'font-size:15px;font-weight:700;',
-  sub: 'color:#666;text-transform:capitalize;',
-  close: 'margin-left:auto;border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:#888;',
-  reqLabel: 'display:block;color:#444;margin-bottom:10px;',
-  reqInput: 'display:block;width:100%;margin-top:3px;padding:6px 8px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box;font:inherit;',
-  row: 'display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #eee;',
+  sub: 'color:rgba(245,241,232,.62);text-transform:capitalize;',
+  close: 'margin-left:auto;border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:rgba(245,241,232,.38);',
+  reqLabel: 'display:block;color:rgba(245,241,232,.62);margin-bottom:10px;',
+  reqInput: `display:block;width:100%;margin-top:3px;padding:6px 8px;background:#070F22;color:#F5F1E8;border:1px solid rgba(255,255,255,.14);border-radius:6px;box-sizing:border-box;font:inherit;`,
+  row: 'display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07);',
   main: 'flex:1;min-width:0;',
   desc: 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
-  meta: 'color:#777;font-size:11px;',
-  qty: 'width:52px;padding:4px;border:1px solid #ccc;border-radius:6px;font:inherit;text-align:center;box-sizing:border-box;',
+  meta: 'color:rgba(245,241,232,.38);font-size:11px;',
+  qty: 'width:52px;padding:4px;background:#070F22;color:#F5F1E8;border:1px solid rgba(255,255,255,.14);border-radius:6px;font:inherit;text-align:center;box-sizing:border-box;',
   ext: 'width:72px;text-align:right;font-variant-numeric:tabular-nums;',
   actions: 'display:flex;align-items:center;gap:10px;margin-top:12px;',
-  copy: 'background:#1a73e8;color:#fff;border:0;border-radius:7px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;',
+  copy: 'background:#F0B842;color:#0A1633;border:0;border-radius:7px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;',
   status: 'font-size:12px;',
   msg: 'padding:6px 2px;',
 };
@@ -59,7 +83,7 @@ function render(card, r, savedName) {
   const close = el('button', S.close, '×');
   close.onclick = () => document.getElementById(HOST)?.remove();
   const head = el('div', S.head);
-  head.append(el('span', S.count, `${r.count} item${r.count === 1 ? '' : 's'}`), el('span', S.sub, `${r.storeName} · ${r.mode}`), close);
+  head.append(brandMark(), el('span', S.count, `${r.count} item${r.count === 1 ? '' : 's'}`), el('span', S.sub, `${r.storeName} · ${r.mode}`), close);
 
   // Requestor
   const reqLabel = el('label', S.reqLabel, 'Requestor');
@@ -95,6 +119,8 @@ function render(card, r, savedName) {
 
   // Actions
   const copyBtn = el('button', S.copy, 'Copy rows');
+  copyBtn.onmouseenter = () => { copyBtn.style.background = C.goldHover; };
+  copyBtn.onmouseleave = () => { copyBtn.style.background = C.gold; };
   const stat = el('span', S.status, '');
   const actions = el('div', S.actions);
   actions.append(copyBtn, stat);
@@ -109,7 +135,7 @@ function render(card, r, savedName) {
     setName(n);
     const ok = await copyRows(rows);
     stat.textContent = ok ? `Copied ${rows.length} row${rows.length === 1 ? '' : 's'} — paste into the sheet` : 'Copy failed — try again';
-    stat.style.color = ok ? '#137333' : '#c5221f';
+    stat.style.color = ok ? C.green : C.red;
   };
 
   card.append(head, reqLabel, table, actions);
@@ -170,4 +196,19 @@ function el(tag, css, text) {
   if (css) n.style.cssText = css;
   if (text != null) n.textContent = text;
   return n;
+}
+
+// Warbots mono mark for the panel header. fill="currentColor" inherits the
+// span's gold color. innerHTML (not a <style>/style attr) so a page's CSP
+// can't strip it; size via CSSOM, consistent with the rest of this overlay.
+function brandMark() {
+  const span = el('span', S.mark);
+  span.innerHTML = markSvg;
+  const svg = span.querySelector('svg');
+  if (svg) {
+    svg.setAttribute('width', '16');
+    svg.setAttribute('height', '16');
+    svg.style.display = 'block';
+  }
+  return span;
 }

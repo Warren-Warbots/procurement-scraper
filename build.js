@@ -11,7 +11,7 @@
 // strict-CSP sites block externally-loaded code, and the mobile path is parked.
 
 import esbuild from 'esbuild';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, copyFileSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -32,6 +32,9 @@ async function bundle(entry, { minify }) {
     target: ['es2020'],
     write: false,
     legalComments: 'none',
+    // Inline the brand mono mark (assets/warbotslogo-mono.svg) as a string so
+    // the overlay can render it; keeps a single source for the asset.
+    loader: { '.svg': 'text' },
   });
   return result.outputFiles[0].text.trim();
 }
@@ -43,11 +46,25 @@ const bookmarkletUrl = 'javascript:' + bookmarkletCode.replace(/%/g, '%25').repl
 const shortcutCode = await bundle('src/wrappers/shortcut.js', { minify: true });
 const shortcutSnippet = `// Put your name between the quotes, then leave the rest as-is:\nvar PROC_REQUESTOR = "";\n${shortcutCode}`;
 
-const installPage = installHtml(bookmarkletUrl, VERSION);
+// Brand mono mark, inlined into the install-page header (fill:currentColor →
+// colored gold by CSS). Strip the intrinsic width/height so CSS sizes it.
+const monoMark = readFileSync(join(root, 'assets/warbotslogo-mono.svg'), 'utf8')
+  .replace(/\s+width="[^"]*"\s+height="[^"]*"/, '')
+  .trim();
+
+const installPage = installHtml(bookmarkletUrl, VERSION, monoMark);
 
 // dist/ holds all build artifacts; docs/ is what GitHub Pages publishes.
 const docs = join(root, 'docs');
 mkdirSync(docs, { recursive: true });
+
+// Sync the brand standard into the published tree: canonical tokens.css +
+// favicon. tokens.css and assets/ at repo root are byte-faithful copies of
+// ~/.warbots-coord (the synced-file delivery model); never hand-edit them.
+mkdirSync(join(docs, 'assets'), { recursive: true });
+copyFileSync(join(root, 'tokens.css'), join(docs, 'tokens.css'));
+copyFileSync(join(root, 'assets/favicon.svg'), join(docs, 'assets/favicon.svg'));
+copyFileSync(join(root, 'assets/warbotslogo-mono.svg'), join(docs, 'assets/warbotslogo-mono.svg'));
 
 writeFileSync(join(dist, 'bookmarklet.txt'), bookmarkletUrl);
 writeFileSync(join(dist, 'install.html'), installPage);
@@ -62,27 +79,40 @@ console.log(`  docs/ -> GitHub Pages, custom domain ${CUSTOM_DOMAIN} -> ${INSTAL
 
 // --- install page ---
 
-function installHtml(bmUrl, version) {
+function installHtml(bmUrl, version, monoMark) {
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Add to Procurement — install</title>
+<link rel="icon" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css" />
 <style>
-  body { font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 680px; margin: 40px auto; padding: 0 18px; color: #1a1a1a; }
-  h1 { font-size: 24px; } h2 { margin-top: 30px; }
-  .bm { display: inline-block; background: #1a73e8; color: #fff; text-decoration: none; padding: 11px 20px; border-radius: 8px; font-weight: 600; }
+  /* tokens.css sets bg/text/font on html,body. Page-specific layout only. */
+  body { max-width: 680px; margin: 40px auto; padding: 0 18px; font-size: var(--wc-fs-15); line-height: var(--wc-leading-relaxed); }
+  .brand { display: flex; align-items: center; gap: var(--wc-space-3); margin-bottom: var(--wc-space-2); }
+  .brand .mark { color: var(--wc-gold); display: flex; flex: 0 0 auto; }
+  .brand .mark svg { width: 34px; height: 34px; display: block; }
+  h1 { font-family: var(--wc-font-serif); font-weight: var(--wc-fw-regular); font-size: var(--wc-fs-32); letter-spacing: var(--wc-tracking-display); line-height: var(--wc-leading-tight); margin: 0; }
+  h2 { margin-top: var(--wc-space-8); font-size: var(--wc-fs-18); letter-spacing: var(--wc-tracking-title); }
+  a { color: var(--wc-blue); }
+  .bm { display: inline-block; background: var(--wc-gold); color: var(--wc-bg); text-decoration: none; padding: 11px 20px; border-radius: var(--wc-radius-lg); font-weight: var(--wc-fw-bold); }
+  .bm:hover { background: var(--wc-gold-hover); }
   ol { padding-left: 20px; } li { margin: 7px 0; }
-  code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; }
-  .tag { color: #888; font-size: 13px; }
-  .note { background: #f6f8fa; border: 1px solid #e3e6ea; border-radius: 8px; padding: 10px 14px; color: #444; }
-  pre { background: #0d1117; color: #e6edf3; padding: 12px; border-radius: 8px; overflow: auto; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all; }
-  button { font: inherit; padding: 6px 12px; border: 1px solid #ccc; border-radius: 6px; background: #fafafa; cursor: pointer; }
+  code { background: var(--wc-panel-hi); border: 1px solid var(--wc-border); padding: 1px 5px; border-radius: var(--wc-radius-sm); }
+  .tag { color: var(--wc-text-mute); font-size: var(--wc-fs-13); }
+  .note { background: var(--wc-surface); border: 1px solid var(--wc-border); border-radius: var(--wc-radius-lg); padding: 10px 14px; color: var(--wc-text-dim); }
+  pre { background: var(--wc-bg-deep); color: var(--wc-text); border: 1px solid var(--wc-border); padding: 12px; border-radius: var(--wc-radius-lg); overflow: auto; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all; }
+  button { font: inherit; padding: 6px 12px; border: 1px solid var(--wc-border); border-radius: var(--wc-radius-md); background: transparent; color: var(--wc-text); cursor: pointer; }
+  button:hover { border-color: var(--wc-border-hi); }
 </style>
 </head>
 <body>
-  <h1>Add to Procurement <span class="tag">v${version}</span></h1>
+  <header class="brand"><span class="mark">${monoMark}</span><h1>Add to Procurement</h1><span class="tag">v${version}</span></header>
   <p>Turns the cart or product page you're on into rows you paste straight into the procurement sheet (columns A–I). Works on <strong>McMaster-Carr, Amazon, and any Shopify store</strong> (WCP, AndyMark, ThriftyBot…).</p>
 
   <h2>Install (desktop Chrome / Edge)</h2>

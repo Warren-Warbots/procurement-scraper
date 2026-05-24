@@ -1,0 +1,203 @@
+/* Warbots Cave · design tokens · CSS custom properties
+ * Version 1.0.0 · Direction D · Cockpit
+ *
+ * Use these vars throughout your app. Override in `.theme-light` if you ever
+ * need a light-mode variant (not yet defined).
+ *
+ * Load Manrope before this file:
+ *   <link rel="preconnect" href="https://fonts.googleapis.com">
+ *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ *   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+ */
+
+:root {
+  /* ─── Color · core ──────────────────────────── */
+  --wc-bg:          #0A1633;
+  --wc-bg-deep:     #070F22;
+  --wc-surface:     #15203F;
+
+  --wc-panel:       rgba(255, 255, 255, 0.03);
+  --wc-panel-hi:    rgba(255, 255, 255, 0.05);
+  --wc-border:      rgba(255, 255, 255, 0.07);
+  --wc-border-hi:   rgba(255, 255, 255, 0.14);
+
+  --wc-text:        #F5F1E8;
+  --wc-text-dim:    rgba(245, 241, 232, 0.62);
+  --wc-text-mute:   rgba(245, 241, 232, 0.38);
+
+  --wc-gold:        #F0B842;
+  --wc-gold-hover:  #E0A832;
+  --wc-green:       #7CD49B;
+  --wc-red:         #E85D5D;
+  --wc-blue:        #9BB7F2;
+
+  /* ─── Color · alpha tints (status chips, callouts) ── */
+  --wc-gold-tint:   rgba(240, 184, 66, 0.12);
+  --wc-gold-border: rgba(240, 184, 66, 0.30);
+  --wc-green-tint:  rgba(124, 212, 155, 0.12);
+  --wc-green-border:rgba(124, 212, 155, 0.30);
+  --wc-red-tint:    rgba(232, 93, 93, 0.12);
+  --wc-red-border:  rgba(232, 93, 93, 0.30);
+  --wc-blue-tint:   rgba(155, 183, 242, 0.06);
+  --wc-blue-border: rgba(155, 183, 242, 0.20);
+
+  /* ─── Typography ─────────────────────────────── */
+  --wc-font-sans:   "Manrope", system-ui, -apple-system, sans-serif;
+  --wc-font-serif:  "Instrument Serif", Georgia, serif;
+
+  --wc-fs-11: 11px;
+  --wc-fs-12: 12px;
+  --wc-fs-13: 13px;
+  --wc-fs-14: 14px;
+  --wc-fs-15: 15px;
+  --wc-fs-18: 18px;
+  --wc-fs-22: 22px;
+  --wc-fs-24: 24px;
+  --wc-fs-28: 28px;
+  --wc-fs-32: 32px;
+  --wc-fs-44: 44px;
+
+  --wc-fw-regular:   400;
+  --wc-fw-medium:    500;
+  --wc-fw-semibold:  600;
+  --wc-fw-bold:      700;
+  --wc-fw-extrabold: 800;
+
+  --wc-tracking-display:  -1.2px;
+  --wc-tracking-title:    -0.5px;
+  --wc-tracking-body:      0;
+  --wc-tracking-label:     0.5px;
+  --wc-tracking-label-lg:  1.5px;
+
+  --wc-leading-tight:   1.0;
+  --wc-leading-snug:    1.1;
+  --wc-leading-normal:  1.45;
+  --wc-leading-relaxed: 1.55;
+
+  /* ─── Spacing ────────────────────────────────── */
+  --wc-space-1: 4px;
+  --wc-space-2: 8px;
+  --wc-space-3: 12px;
+  --wc-space-4: 16px;
+  --wc-space-5: 20px;
+  --wc-space-6: 24px;
+  --wc-space-7: 28px;
+  --wc-space-8: 32px;
+
+  /* ─── Radius ─────────────────────────────────── */
+  --wc-radius-sm:   4px;
+  --wc-radius-md:   8px;
+  --wc-radius-lg:   10px;
+  --wc-radius-xl:   12px;
+  --wc-radius-2xl:  14px;
+  --wc-radius-full: 999px;
+
+  /* ─── Shadow / elevation ─────────────────────── */
+  --wc-shadow-dropdown:  0 8px 24px rgba(0, 0, 0, 0.3);
+  --wc-shadow-modal:     0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --wc-glow-gold:        0 0 60px rgba(240, 184, 66, 0.30);
+  --wc-glow-green:       0 0 60px rgba(124, 212, 155, 0.35);
+
+  /* ─── Size primitives ────────────────────────── */
+  --wc-avatar-xs: 22px;
+  --wc-avatar-sm: 28px;
+  --wc-avatar-md: 36px;
+  --wc-avatar-lg: 56px;
+  --wc-control-h: 40px;
+  --wc-tap-target: 44px;
+}
+
+/* ─── Base · suggested resets ────────────────── */
+html, body {
+  background: var(--wc-bg);
+  color: var(--wc-text);
+  font-family: var(--wc-font-sans);
+  font-size: var(--wc-fs-14);
+  line-height: var(--wc-leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ─── Utility recipes · copy these into components ── */
+
+/* Eyebrow / status label */
+.wc-eyebrow {
+  font-size: var(--wc-fs-11);
+  font-weight: var(--wc-fw-bold);
+  letter-spacing: var(--wc-tracking-label-lg);
+  text-transform: uppercase;
+  color: var(--wc-gold);
+}
+
+/* Primary button */
+.wc-btn-primary {
+  padding: var(--wc-space-3) var(--wc-space-4);
+  background: var(--wc-gold);
+  color: var(--wc-bg);
+  border: none;
+  border-radius: var(--wc-radius-lg);
+  font: var(--wc-fw-bold) var(--wc-fs-13) var(--wc-font-sans);
+  cursor: pointer;
+}
+
+/* Secondary / ghost button */
+.wc-btn-ghost {
+  padding: var(--wc-space-3) var(--wc-space-4);
+  background: transparent;
+  color: var(--wc-text);
+  border: 1px solid var(--wc-border);
+  border-radius: var(--wc-radius-lg);
+  font: var(--wc-fw-semibold) var(--wc-fs-13) var(--wc-font-sans);
+  cursor: pointer;
+}
+
+/* Status chip */
+.wc-chip {
+  font-size: 10.5px;
+  font-weight: var(--wc-fw-bold);
+  padding: 3px 9px;
+  border-radius: var(--wc-radius-full);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.wc-chip-gold  { color: var(--wc-gold);  background: var(--wc-gold-tint);  border: 1px solid var(--wc-gold-border); }
+.wc-chip-green { color: var(--wc-green); background: var(--wc-green-tint); border: 1px solid var(--wc-green-border); }
+.wc-chip-red   { color: var(--wc-red);   background: var(--wc-red-tint);   border: 1px solid var(--wc-red-border); }
+.wc-chip-blue  { color: var(--wc-blue);  background: var(--wc-blue-tint);  border: 1px solid var(--wc-blue-border); }
+
+/* Card / panel */
+.wc-panel {
+  background: var(--wc-panel);
+  border: 1px solid var(--wc-border);
+  border-radius: var(--wc-radius-2xl);
+  padding: var(--wc-space-5);
+}
+
+/* Input */
+.wc-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--wc-bg-deep);
+  color: var(--wc-text);
+  border: 1px solid var(--wc-border);
+  border-radius: var(--wc-radius-lg);
+  font: var(--wc-fw-regular) var(--wc-fs-13) var(--wc-font-sans);
+  outline: none;
+}
+.wc-input:focus { border-color: var(--wc-gold); }
+
+/* Sidebar item */
+.wc-nav-item {
+  padding: 9px 12px;
+  border-radius: var(--wc-radius-md);
+  color: var(--wc-text-dim);
+  font-weight: var(--wc-fw-medium);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.wc-nav-item[aria-current="page"],
+.wc-nav-item.active {
+  background: var(--wc-panel-hi);
+  color: var(--wc-text);
+  font-weight: var(--wc-fw-semibold);
+}
