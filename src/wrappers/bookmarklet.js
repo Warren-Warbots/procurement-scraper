@@ -31,7 +31,6 @@ const S = {
   actions: 'display:flex;align-items:center;gap:10px;margin-top:12px;',
   copy: 'background:#1a73e8;color:#fff;border:0;border-radius:7px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;',
   status: 'font-size:12px;',
-  tsv: 'width:100%;height:72px;margin-top:10px;box-sizing:border-box;border:1px solid #ddd;border-radius:6px;padding:6px;white-space:pre;font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;',
   msg: 'padding:6px 2px;',
 };
 
@@ -88,25 +87,19 @@ function render(card, r, savedName) {
       row.quantity = qty.value;
       recompute(row);
       ext.textContent = `$${row.extendedCost.toFixed(2)}`;
-      refresh();
     });
     const tr = el('div', S.row);
     tr.append(m, qty, ext);
     table.append(tr);
   });
 
-  // Actions + TSV preview
+  // Actions
   const copyBtn = el('button', S.copy, 'Copy rows');
   const stat = el('span', S.status, '');
   const actions = el('div', S.actions);
   actions.append(copyBtn, stat);
-  const ta = el('textarea', S.tsv);
-  ta.readOnly = true;
-  ta.spellcheck = false;
-  ta.title = 'Paste this into the sheet';
 
-  function refresh() { ta.value = toTSV(rows); }
-  function setName(n) { rows.forEach((x) => (x.requestor = n)); refresh(); }
+  const setName = (n) => rows.forEach((x) => (x.requestor = n));
   setName(savedName);
   reqInput.addEventListener('input', () => setName(reqInput.value.trim()));
 
@@ -114,18 +107,18 @@ function render(card, r, savedName) {
     const n = reqInput.value.trim();
     if (n) localStorage.setItem(KEY, n);
     setName(n);
-    const ok = await copyRows(rows, ta);
-    stat.textContent = ok ? `Copied ${rows.length} row${rows.length === 1 ? '' : 's'} — paste into the sheet` : 'Select the text below and copy';
+    const ok = await copyRows(rows);
+    stat.textContent = ok ? `Copied ${rows.length} row${rows.length === 1 ? '' : 's'} — paste into the sheet` : 'Copy failed — try again';
     stat.style.color = ok ? '#137333' : '#c5221f';
   };
 
-  card.append(head, reqLabel, table, actions, ta);
+  card.append(head, reqLabel, table, actions);
 }
 
 // Put BOTH a TSV (text/plain) and an HTML table (text/html) on the clipboard.
 // Sheets/Excel use the HTML table and lay it into cells reliably; plain-text
 // targets get the TSV. Falls back to writeText, then a textarea select+copy.
-async function copyRows(rows, textarea) {
+async function copyRows(rows) {
   const tsv = toTSV(rows);
   try {
     if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
@@ -139,8 +132,18 @@ async function copyRows(rows, textarea) {
     }
   } catch {}
   try { await navigator.clipboard.writeText(tsv); return true; } catch {}
-  try { textarea.focus(); textarea.select(); return document.execCommand('copy'); } catch {}
-  return false;
+  // Last resort: a throwaway off-screen textarea + execCommand.
+  try {
+    const t = document.createElement('textarea');
+    t.value = tsv;
+    t.style.cssText = 'position:fixed;left:-9999px;top:0';
+    document.body.appendChild(t);
+    t.focus();
+    t.select();
+    const ok = document.execCommand('copy');
+    t.remove();
+    return ok;
+  } catch { return false; }
 }
 
 function mount() {
