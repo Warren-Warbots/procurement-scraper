@@ -1,6 +1,6 @@
 {
   "name": "procurement-scraper",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Scrape the current cart or product page into clean procurement rows (TSV) for the team sheet.",
