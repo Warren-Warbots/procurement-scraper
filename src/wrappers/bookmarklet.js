@@ -40,7 +40,7 @@ const C = {
 const S = {
   card: `box-sizing:border-box;width:min(420px,92vw);max-height:80vh;overflow:auto;background:#15203F;color:#F5F1E8;border:1px solid rgba(255,255,255,.14);border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);padding:14px;font:13px/1.45 ${FONT};`,
   head: 'display:flex;align-items:center;gap:8px;margin-bottom:10px;',
-  mark: 'color:#F0B842;display:flex;flex:0 0 auto;',
+  mark: 'color:#F5F1E8;display:flex;flex:0 0 auto;',
   count: 'font-size:15px;font-weight:700;',
   sub: 'color:rgba(245,241,232,.62);text-transform:capitalize;',
   close: 'margin-left:auto;border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:rgba(245,241,232,.38);',

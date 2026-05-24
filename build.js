@@ -46,8 +46,8 @@ const bookmarkletUrl = 'javascript:' + bookmarkletCode.replace(/%/g, '%25').repl
 const shortcutCode = await bundle('src/wrappers/shortcut.js', { minify: true });
 const shortcutSnippet = `// Put your name between the quotes, then leave the rest as-is:\nvar PROC_REQUESTOR = "";\n${shortcutCode}`;
 
-// Brand mono mark, inlined into the install-page header (fill:currentColor →
-// colored gold by CSS). Strip the intrinsic width/height so CSS sizes it.
+// Brand mono mark (line-art), inlined into the install-page header
+// (fill:currentColor → colored white by CSS). Strip the intrinsic width/height so CSS sizes it.
 const monoMark = readFileSync(join(root, 'assets/warbotslogo-mono.svg'), 'utf8')
   .replace(/\s+width="[^"]*"\s+height="[^"]*"/, '')
   .trim();
@@ -95,7 +95,7 @@ function installHtml(bmUrl, version, monoMark) {
   /* tokens.css sets bg/text/font on html,body. Page-specific layout only. */
   body { max-width: 680px; margin: 40px auto; padding: 0 18px; font-size: var(--wc-fs-15); line-height: var(--wc-leading-relaxed); }
   .brand { display: flex; align-items: center; gap: var(--wc-space-3); margin-bottom: var(--wc-space-2); }
-  .brand .mark { color: var(--wc-gold); display: flex; flex: 0 0 auto; }
+  .brand .mark { color: var(--wc-text); display: flex; flex: 0 0 auto; }
   .brand .mark svg { width: 34px; height: 34px; display: block; }
   h1 { font-family: var(--wc-font-serif); font-weight: var(--wc-fw-regular); font-size: var(--wc-fs-32); letter-spacing: var(--wc-tracking-display); line-height: var(--wc-leading-tight); margin: 0; }
   h2 { margin-top: var(--wc-space-8); font-size: var(--wc-fs-18); letter-spacing: var(--wc-tracking-title); }
