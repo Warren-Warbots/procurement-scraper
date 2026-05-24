@@ -74,6 +74,28 @@ test('shopify product -> selected variant via ?variant=, qty defaults to 1', asy
   assert.equal(rows[0].weblink, 'https://wcproducts.com/products/htd-timing-belts-9mm-width?variant=789');
 });
 
+test('wcp kit-builder product page -> only CHECKED, visible components with their qty', async () => {
+  const ctx = ctxFromHtml(fixture('wcp-configurator.html'), 'https://wcproducts.com/collections/gearboxes/products/swerve-x2i');
+  const { rows, mode, storeName } = await scrape({ ...fixedOpts, ctx });
+  assert.equal(mode, 'product');
+  assert.equal(storeName, 'WCP');
+  assert.equal(rows.length, 2, 'unchecked add-on and hidden alternate must be excluded');
+
+  assert.equal(rows[0].partNumber, 'KIT-0094');
+  assert.equal(rows[0].description, 'Kit: WCP Swerve X2i (Tube Mount)');
+  assert.equal(rows[0].quantity, 2);
+  assert.equal(rows[0].unitCost, 224.99);
+  assert.equal(rows[0].extendedCost, 449.98);
+  assert.equal(rows[0].weblink, 'https://wcproducts.com/collections/gearboxes/products/swerve-x2i');
+
+  assert.equal(rows[1].partNumber, 'KIT-0099');
+  assert.equal(rows[1].description, 'Kit: X1/X2 Ratio Set (8mm SplineXS Bore, Swerve X2)');
+  assert.equal(rows[1].quantity, 1);
+  assert.equal(rows[1].unitCost, 74.99);
+
+  assert.ok(!rows.some((r) => r.partNumber === 'WCP-0941' || r.partNumber === 'WCP-1701'));
+});
+
 test('amazon cart -> active items only, qty + price parsed, dp url, ASIN as part #', async () => {
   const ctx = ctxFromHtml(fixture('amazon-cart.html'), 'https://www.amazon.com/cart');
   const { rows, mode, storeName } = await scrape({ ...fixedOpts, ctx });

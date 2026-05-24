@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head><title>WCP Swerve X2i</title></head>
+<body>
+  <!-- Mirrors the live WCP kit-builder markup: div.admin__field-option rows,
+       input.product-custom-option checkbox, SKU as "(KIT-0094)", "+$" price,
+       and a per-row input.option-qty on checked rows. -->
+
+  <div class="field choice admin__field admin__field-option">
+    <input type="checkbox" class="checkbox admin__control-checkbox product-custom-option" checked />
+    <label>Kit: WCP Swerve X2i (Tube Mount) (KIT-0094) +$224.99 BackOrdered</label>
+    <input type="number" class="input-text option-qty" name="options_qty[1008][10026]" value="2" />
+  </div>
+
+  <div class="field choice admin__field admin__field-option">
+    <input type="checkbox" class="checkbox admin__control-checkbox product-custom-option" checked />
+    <label>Kit: X1/X2 Ratio Set (8mm SplineXS Bore, Swerve X2) (KIT-0099) +$74.99 BackOrdered</label>
+    <input type="number" class="input-text option-qty" name="options_qty[1008][10027]" value="1" />
+  </div>
+
+  <!-- Unchecked add-on: must be excluded -->
+  <div class="field choice admin__field admin__field-option">
+    <input type="checkbox" class="checkbox admin__control-checkbox product-custom-option" />
+    <label>Kraken X44 Powered by TalonFX (WCP-0941) +$217.99 BackOrdered</label>
+  </div>
+
+  <!-- Hidden base-kit alternate (wrong motor shaft); checked but ihidden: must be excluded -->
+  <div class="field choice admin__field admin__field-option ihidden">
+    <input type="checkbox" class="checkbox admin__control-checkbox product-custom-option" checked />
+    <label>WCP Swerve X2 Base Kit (WCP-1701) +$34.99</label>
+  </div>
+</body>
+</html>
