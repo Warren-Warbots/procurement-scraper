@@ -1,3 +1,5 @@
+> **Deprecated (2026-11-05).** This tool now lives in [`Warren-Warbots/warbots-apps`](https://github.com/Warren-Warbots/warbots-apps) under `apps/req`, served at req.team9408.com. This repo is archived and no longer deployed.
+
 # Procurement scraper
 
 Scrapes the **cart** or the **single product page** you're viewing into clean
